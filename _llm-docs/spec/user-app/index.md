@@ -19,26 +19,8 @@ LINEミニアプリ注文システムのフロントエンド（LIFFアプリ）
 
 ## 認証フロー
 
-```mermaid
-sequenceDiagram
-    participant User as LIFF App
-    participant API as line-order-api
-    participant LINE as LINE API
-
-    User->>User: liff.init() / getIDToken()
-    User->>API: GET /user-token (header: line-id-token)
-    API->>LINE: ID Token 検証
-    LINE-->>API: lineUserId + 表示名
-    API-->>User: { userToken (JWT), lineUserId }
-    Note over User,API: 以降は Authorization: Bearer {userToken}
-```
-
-- 起動時にLIFFを初期化し、ID Tokenを取得して `GET /user-token` へ送ります。
-- 検証後にアプリ用の `userToken`（JWT・1時間）を受け取り、以降のAPI呼び出しの `Authorization: Bearer` に付与します。
-- `userToken` はReduxに保持します。401のときは再ログインを促します。
-- 注文時は別途 `liff.getAccessToken()` で取得したLIFFアクセストークンを `POST /orders` のボディに含めます（サービス通知トークン発行に使います。認証用ではありません）。
-
-詳細な認証仕様はbackend側 [../backend/index.md](../backend/index.md) と [../backend/security.md](../backend/security.md) を参照してください。
+- 起動時にLIFFを初期化し、IDトークンの検証を経てアプリ用の `userToken`（JWT・1時間）を取得します。以降のAPI呼び出しの `Authorization: Bearer` に付与します。
+- 初期化・ログイン・コールバック処理・トークン管理の正本仕様は [line-auth.md](line-auth.md) を参照してください。
 
 ## 画面構成・ルーティング
 
